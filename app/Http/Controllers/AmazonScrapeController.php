@@ -27,7 +27,7 @@ class AmazonScrapeController extends Controller
 
         $price = $crawler->filter("#corePrice_feature_div")->text();
         $price = explode("R$", $price);
-        $price = "R$" . $price[1];
+        $price = "R$ " . $price[1];
 
         if ($crawler->filter("#cm-cr-dp-review-header")->text()) {
             $review = $crawler->filter("#cm-cr-dp-review-header")->text();
@@ -121,6 +121,23 @@ class AmazonScrapeController extends Controller
         $twoStars = $crawler->filter('td.a-text-right.a-nowrap span.a-size-base')->eq(3)->text()." de avaliações possuem 2 estrelas";
         $oneStars = $crawler->filter('td.a-text-right.a-nowrap span.a-size-base')->eq(4)->text()." de avaliações possuem 1 estrelas";
 
+        $stars = [
+            $fiveStars,
+            $fourStars,
+            $threeStars,
+            $twoStars,
+            $oneStars,
+        ];
+
+        if($crawler->filter('.a-section.olp-link-widget a.a-touch-link')->count() > 0){
+            $offersNumber = $crawler->filter('.a-section.olp-link-widget a.a-touch-link')->text();
+            $offersNumber = explode(' ofertas', $offersNumber);
+            $offersNumber = explode(' ', $offersNumber[0]);
+            $offersNumber = end($offersNumber). " vendedores";
+        }else{
+            $offersNumber = "1 vendedor";
+        }
+        
 
         return response()->json([
             'title' => $title,
@@ -136,15 +153,13 @@ class AmazonScrapeController extends Controller
             'ASIN' => $asin,
 
             'data' => $disponivelDesde,
-            'diasOnline' => $diasPassados,
+            'diasOnline' => $diasPassados." dia(s)",
             'rankings' => $rankings,
             'mediaVendasDia' => $mediaVendasDia,
 
-            'five' => $fiveStars,
-            'four' => $fourStars,
-            'three' => $threeStars,
-            'two' => $twoStars,
-            'one' => $oneStars
+            'stars' => $stars,
+
+            'offers' => $offersNumber
 
         ]);
     }
