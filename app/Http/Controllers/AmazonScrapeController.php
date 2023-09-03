@@ -115,37 +115,37 @@ class AmazonScrapeController extends Controller
             $mediaVendasDia = "Não encontrado";
         }
 
-        if($crawler->filter('td.a-text-right.a-nowrap a.a-size-base.a-link-normal')->eq(0)){
-            $fiveStars = $crawler->filter('td.a-text-right.a-nowrap a.a-size-base.a-link-normal')->eq(0)->text()." de avaliações possuem 5 estrelas";
-        }else{
-            $fiveStars = "0% de avaliações possuem 5 estrelas";
-        }
-
-        if($crawler->filter('td.a-text-right.a-nowrap a.a-size-base.a-link-normal')->eq(1)->count() > 0){
-            $fourStars = $crawler->filter('td.a-text-right.a-nowrap a.a-size-base.a-link-normal')->eq(1)->text()." de avaliações possuem 4 estrelas";
-        }else{
-            $fourStars = "0% de avaliações possuem 4 estrelas";
-        }
-
-        if($crawler->filter('td.a-text-right.a-nowrap a.a-size-base.a-link-normal')->eq(2)->count() > 0){
-            $threeStars = $crawler->filter('td.a-text-right.a-nowrap a.a-size-base.a-link-normal')->eq(2)->text()." de avaliações possuem 3 estrelas";
-        }else{
-            $threeStars = "0% de avaliações possuem 3 estrelas";
-        }
-
-        if($crawler->filter('td.a-text-right.a-nowrap a.a-size-base.a-link-normal')->eq(3)->count() > 0){
-            $twoStars = $crawler->filter('td.a-text-right.a-nowrap a.a-size-base.a-link-normal')->eq(3)->text()." de avaliações possuem 2 estrelas";
-        }else{
-            $twoStars = "0% de avaliações possuem 2 estrelas";
-        }
-
-        if($crawler->filter('td.a-text-right.a-nowrap a.a-size-base.a-link-normal')->eq(4)->count() > 0){
-            $oneStars = $crawler->filter('td.a-text-right.a-nowrap a.a-size-base.a-link-normal')->eq(4)->text()." de avaliações possuem 1 estrelas";
-        }else{
-            $oneStars = "0% de avaliações possuem 1 estrelas";
-        }
-
         
+        if($crawler->filter('tr.a-histogram-row.a-align-center td.a-text-right.a-nowrap.a-nowrap a.a-size-base.a-link-normal')->eq(0)->count() > 0){
+            $fiveStars = $crawler->filter('tr.a-histogram-row.a-align-center td.a-text-right.a-nowrap.a-nowrap a.a-size-base.a-link-normal')->eq(0)->text();
+        }else{
+            $fiveStars = "0%";
+        }
+
+        if($crawler->filter('tr.a-histogram-row.a-align-center td.a-text-right.a-nowrap.a-nowrap a.a-size-base.a-link-normal')->eq(1)->count() > 0){
+            $fourStars = $crawler->filter('tr.a-histogram-row.a-align-center td.a-text-right.a-nowrap.a-nowrap a.a-size-base.a-link-normal')->eq(1)->text();
+        }else{
+            $fourStars = "0%";
+        }
+
+        if($crawler->filter('tr.a-histogram-row.a-align-center td.a-text-right.a-nowrap.a-nowrap a.a-size-base.a-link-normal')->eq(2)->count() > 0){
+            $threeStars = $crawler->filter('tr.a-histogram-row.a-align-center td.a-text-right.a-nowrap.a-nowrap a.a-size-base.a-link-normal')->eq(2)->text();
+        }else{
+            $threeStars = "0%";
+        }
+
+        if($crawler->filter('tr.a-histogram-row.a-align-center td.a-text-right.a-nowrap.a-nowrap a.a-size-base.a-link-normal')->eq(3)->count() > 0){
+            $twoStars = $crawler->filter('tr.a-histogram-row.a-align-center td.a-text-right.a-nowrap.a-nowrap a.a-size-base.a-link-normal')->eq(3)->text();
+        }else{
+            $twoStars = "0%";
+        }
+
+        if($crawler->filter('tr.a-histogram-row.a-align-center td.a-text-right.a-nowrap.a-nowrap a.a-size-base.a-link-normal')->eq(4)->count() > 0){
+            $oneStars = $crawler->filter('tr.a-histogram-row.a-align-center td.a-text-right.a-nowrap.a-nowrap a.a-size-base.a-link-normal')->eq(4)->text();
+        }else{
+            $oneStars = "0%";
+        }
+        //$fiveStars = $crawler->filter('tr.a-histogram-row.a-align-center td.a-text-right.a-nowrap.a-nowrap a.a-size-base.a-link-normal')->eq(3)->text();
         //$fiveStars = $crawler->filter('td.a-text-right.a-nowrap span.a-size-base')->eq(0)->text()." de avaliações possuem 5 estrelas";
         /* $fourStars = $crawler->filter('td.a-text-right.a-nowrap a.a-size-base.a-link-normal')->eq(1)->text()." de avaliações possuem 4 estrelas";
         $threeStars = $crawler->filter('td.a-text-right.a-nowrap a.a-size-base.a-link-normal')->eq(2)->text()." de avaliações possuem 3 estrelas";
@@ -153,11 +153,11 @@ class AmazonScrapeController extends Controller
         $oneStars = $crawler->filter('td.a-text-right.a-nowrap a.a-size-base.a-link-normal')->eq(4)->text()." de avaliações possuem 1 estrelas";
  */
         $stars = [
-            $fiveStars,
-            $fourStars,
-            $threeStars,
-            $twoStars,
-            $oneStars
+            $fiveStars." de avaliações possuem 5 estrelas",
+            $fourStars." de avaliações possuem 4 estrelas",
+            $threeStars." de avaliações possuem 3 estrelas",
+            $twoStars." de avaliações possuem 2 estrelas",
+            $oneStars." de avaliações possuem 1 estrela"
         ];
 
         if($crawler->filter('.a-section.olp-link-widget a.a-touch-link')->count() > 0){
