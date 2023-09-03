@@ -114,19 +114,19 @@ class AmazonScrapeController extends Controller
             $rankings = "Não encontrado";
             $mediaVendasDia = "Não encontrado";
         }
-        
-        $fiveStars = $crawler->filter('td.a-text-right.a-nowrap span.a-size-base')->eq(0)->text()." de avaliações possuem 5 estrelas";
-        $fourStars = $crawler->filter('td.a-text-right.a-nowrap span.a-size-base')->eq(1)->text()." de avaliações possuem 4 estrelas";
-        $threeStars = $crawler->filter('td.a-text-right.a-nowrap span.a-size-base')->eq(2)->text()." de avaliações possuem 3 estrelas";
-        $twoStars = $crawler->filter('td.a-text-right.a-nowrap span.a-size-base')->eq(3)->text()." de avaliações possuem 2 estrelas";
-        $oneStars = $crawler->filter('td.a-text-right.a-nowrap span.a-size-base')->eq(4)->text()." de avaliações possuem 1 estrelas";
+        $fiveStars = $crawler->filter('td.a-text-right.a-nowrap a.a-size-base.a-link-normal')->eq(0)->text()." de avaliações possuem 5 estrelas";
+        //$fiveStars = $crawler->filter('td.a-text-right.a-nowrap span.a-size-base')->eq(0)->text()." de avaliações possuem 5 estrelas";
+        $fourStars = $crawler->filter('td.a-text-right.a-nowrap a.a-size-base.a-link-normal')->eq(1)->text()." de avaliações possuem 4 estrelas";
+        $threeStars = $crawler->filter('td.a-text-right.a-nowrap a.a-size-base.a-link-normal')->eq(2)->text()." de avaliações possuem 3 estrelas";
+        $twoStars = $crawler->filter('td.a-text-right.a-nowrap a.a-size-base.a-link-normal')->eq(3)->text()." de avaliações possuem 2 estrelas";
+        $oneStars = $crawler->filter('td.a-text-right.a-nowrap a.a-size-base.a-link-normal')->eq(4)->text()." de avaliações possuem 1 estrelas";
 
         $stars = [
             $fiveStars,
             $fourStars,
             $threeStars,
             $twoStars,
-            $oneStars,
+            $oneStars
         ];
 
         if($crawler->filter('.a-section.olp-link-widget a.a-touch-link')->count() > 0){
