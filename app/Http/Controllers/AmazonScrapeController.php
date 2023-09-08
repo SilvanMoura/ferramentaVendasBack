@@ -197,12 +197,231 @@ class AmazonScrapeController extends Controller
 
     public function calculatorMargin($asin)
     {
+        // Defina os headers para simular um navegador real
+        $headers = [
+            'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
+            'Accept-Language' => 'en-US,en;q=0.9',
+        ];
+
+        $client = new Client(HttpClient::create(['headers' => $headers]));
+
+        $url = "https://www.amazon.com.br/dp/$asin";
+
+        $crawler = $client->request('GET', $url);
+
+        $title = $crawler->filter('#productTitle')->text();
+
+        $price = $crawler->filter("#corePrice_feature_div")->text();
+        $price = explode("R$", $price);
+        $price = str_replace(".", "", $price[1]);
+        $price = str_replace(",", ".", $price);
+
+        // Converte o número formatado em um float
+        $price = (float)$price;
+
+        if ($crawler->filter("#cm-cr-dp-review-header")->text()) {
+            $review = $crawler->filter("#cm-cr-dp-review-header")->text();
+            $reviewNumber = "Nenhuma avaliação disponível";
+        } else {
+            $reviewNumber = $crawler->filter("#acrCustomerReviewText")->text();
+        }
+
+        $enviadoVendido = $crawler->filter(".a-size-small.tabular-buybox-text-message");
+
+        $infos = [];
+        foreach ($enviadoVendido as $element) {
+            $infos[] = $element->textContent;
+        }
+        $enviado = $infos[1];
+        $vendido = $infos[2];
+
+        if( ($enviado == 'Amazon.com.br' || $enviado == 'Amazon') && ($vendido == 'Amazon.com.br' || $vendido == 'Amazon') ){
+            $logistica = "FBA";
+        }
+        else if( ($enviado == 'Amazon.com.br' || $enviado == 'Amazon') && $vendido == $vendido){
+            $logistica = "FBA";
+        }
+        else if($enviado == $vendido && $vendido == $vendido){
+            $logistica = "DBA";
+        }  
+
+        //$titulo = $crawler->filter('.a-size-medium.a-spacing-small.secHeader h1')->text();
+        $disponivelDesde = $crawler->filter('tr th:contains("Disponível para compra desde") + td');
+        if($disponivelDesde->count() > 0){
+
+            $rankings = $crawler->filter('tr th:contains("Ranking dos mais vendidos") + td')->text();
+            $rankings = preg_replace('/\([^)]+\)/', '', $rankings);
+            $rankings = preg_replace('/\b\d+\b|\bem\b/', '', $rankings);
+            $rankings = preg_split('/\s*Nº\s*/', $rankings, -1, PREG_SPLIT_NO_EMPTY); 
+            $rankings = preg_replace('/,  /', '', $rankings); 
+        }else{
+            $rankings = "Não encontrado";
+        }
+
+        $comissoes = [
+            "Cozinha" => 13,
+            "Eletrônicos" => 13,
+            "TV e Cinema em Casa" => 10,
+            "Casa" => 14,
+            "Alimentos e Bebidas" => 9,
+            "Bebidas Alcoólicas" => 9,
+            "Bolsas, Malas e Mochilas" => 15,
+            "Ferramentas e Construção" => 14,
+            "Ferramentas e Materiais de Construção" => 14,
+            "Bebês" => 12,
+            "Beleza de Luxo" => 14,
+            "Produtos Industriais e Científicos" => 13,
+            "Pet Shop" => 12,
+            "Automotivo" => 12,
+            "Dvd e Blu-ray" => 15,
+            "Games e Consoles" => 13,
+            "Livros" => 15,
+            "Papelaria e Escritório" => 14,
+            "Roupas, Calçados E Acessórios" => 15,
+            "Beleza" => 13,
+            "Brinquedos e Jogos" => 12,
+            "Eletrodomésticos" => 8,
+            "Celulares e Comunicação" => 13,
+            "Esportes, Aventura e Lazer" => 13,
+            "Computadores e Informática" => 12,
+            "Câmeras e Foto" => 13,
+            "Móveis" => [
+                "até R$ 200,00" => 15,
+                "acima de R$ 200,00" => 9
+            ],
+            "Instrumentos Musicais" => 15,
+            "Saúde e Bem-Estar" => 11,
+            "Jardim e Piscina" => 12,
+            "Cuidados Pessoais" => 10,
+            "Cd e Vinil" => 15,
+            "Limpeza de Casa" => 15,
+            "Acessórios" => 15,
+            "Material Escolar" => 15,
+            "Loja Kindle" => 15
+        ];
+
+        $tarifaFBA = [
+            100 => 12.95,
+            200 => 13.45,
+            300 => 13.95,
+            400 => 14.45,
+            500 => 14.95,
+            750 => 15.45,
+            1000 => 15.95,
+            1500 => 16.95,
+            2000 => 17.95,
+            3000 => 18.95,
+            4000 => 19.95,
+            5000 => 20.95,
+            6000 => 25.95,
+            7000 => 27.95,
+            8000 => 29.95,
+            9000 => 31.95,
+            10000 => 43.45
+        ];
+
+        $tarifasDbaFixed = [
+            "all" => 5.50,
+        ];
+
+        $tarifasDbaVariable = [
+            250 => 22.70,
+            500 => 23.70,
+            1000 => 25.45,
+            2000 => 28.45,
+            3000 => 33.48,
+            4000 => 34.95,
+            5000 => 37.45,
+            6000 => 45.20,
+            7000 => 46.95,
+            8000 => 48.20,
+            9000 => 53.95,
+            10000 => 70.45
+        ];
+
+        if(array_key_exists($rankings[0], $comissoes)){
+            $comissaoProduct = $rankings[0];
+            $comissaoPercent = $comissoes[$rankings[0]];
+        }else{
+            $comissaoProduct = "Outros";
+            $comissaoPercent = 15;
+        }
         
+        $rowElement = $crawler->filter('#productDetails_techSpec_section_1 th:contains("Peso do produto")');
+        if($rowElement->count() > 0){
+            $rowElement = $rowElement->first()->nextAll()->filter('td')->text();
+        }
+
+        $rowElementAlt = $crawler->filter('#productDetails_techSpec_section_1 th:contains("Dimensões do produto")');
+        if($rowElementAlt->count() > 0){
+            $rowElementAlt = $rowElementAlt->first()->nextAll()->filter('td')->text();
+            $rowElementAlt = explode('; ', $rowElementAlt);
+
+            if (strpos($rowElementAlt[1], "Quilogramas") !== false) {
+                $rowElementAlt = str_replace(" Quilogramas", '', $rowElementAlt[1]);
+                $rowElement = floatval(str_replace(',', '.', $rowElementAlt))*1000;
+            }
+
+            if (strpos($rowElementAlt[1], "g") !== false) {
+                $rowElementAlt = str_replace(" g", '', $rowElementAlt[1]);
+                $rowElement = floatval(str_replace(',', '.', $rowElementAlt));
+            }
+
+        }
+        
+
+        if (strpos($rowElement, "Kilograms") !== false) {
+            $peso = preg_replace("/[^0-9,]/", "", $rowElement);
+            $peso = str_replace(",", ".", $peso);
+            $peso = floatval($peso*1000);
+        }else{
+            $peso = $rowElement;
+        }
+
+        if($logistica == "FBA"){
+            foreach ($tarifaFBA as $limitePeso => $tarifa) {
+                if ($peso <= $limitePeso) {
+                    $valorTarifa = $tarifa;
+                    break;
+                }else{
+                    $valorTarifa = 43.45+(3.05*(($peso - 10000)/1000));
+                }
+            }
+        }else{
+            if($price > 79){
+                foreach ($tarifasDbaVariable as $limitePeso => $tarifa) {
+                    if ($peso < $limitePeso) {
+                        $valorTarifa = $tarifa;
+                        break;
+                    }else{
+                        $valorTarifa = 70.45+(3.50*(($peso - 10000)/1000));
+                    }
+                }
+            }else{
+                $valorTarifa = $tarifasDbaFixed["all"];
+            }
+        }
+
+
+
+        
+
+        return response()->json([
+            'title' => $title,
+            'price' => $price,
+            'reviewNumber' => $reviewNumber,
+            'enviado' => $enviado,
+            'vendido' => $vendido,
+            'logistica' => $logistica,
+            'ASIN' => $asin,
+
+            'comissaoProduct' => $comissaoProduct,
+            'comissaoPercent' => $comissaoPercent,
+            'peso' => $peso,
+            'valorTarifa' => $valorTarifa
+        ]);
     }
 }
-
-
-
 
 
 
