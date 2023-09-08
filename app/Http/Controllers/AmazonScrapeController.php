@@ -151,7 +151,7 @@ class AmazonScrapeController extends Controller
         $threeStars = $crawler->filter('td.a-text-right.a-nowrap a.a-size-base.a-link-normal')->eq(2)->text()." de avaliações possuem 3 estrelas";
         $twoStars = $crawler->filter('td.a-text-right.a-nowrap a.a-size-base.a-link-normal')->eq(3)->text()." de avaliações possuem 2 estrelas";
         $oneStars = $crawler->filter('td.a-text-right.a-nowrap a.a-size-base.a-link-normal')->eq(4)->text()." de avaliações possuem 1 estrelas";
- */
+        */
         $stars = [
             $fiveStars." de avaliações possuem 5 estrelas",
             $fourStars." de avaliações possuem 4 estrelas",
@@ -195,6 +195,8 @@ class AmazonScrapeController extends Controller
         ]);
     }
 }
+
+
 
 
 

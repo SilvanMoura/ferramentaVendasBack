@@ -21,6 +21,7 @@ Route::post('/login', [ AuthController::class, 'login' ]);
 Route::post('/register', [ AuthController::class, 'register' ]);
 
 Route::get('/scrape/{asin}', [AmazonScrapeController::class, 'scrape']);
+Route::get('/calculatorMargin/{asin}', [AmazonScrapeController::class, 'calculatorMargin']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
