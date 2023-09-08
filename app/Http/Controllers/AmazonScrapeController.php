@@ -194,6 +194,11 @@ class AmazonScrapeController extends Controller
 
         ]);
     }
+
+    public function calculatorMargin($asin)
+    {
+        
+    }
 }
 
 
