@@ -7,7 +7,7 @@ use GuzzleHttp\Client;
 
 class MercadoLivreController extends Controller
 {
-    public function welcome($itemId)
+    public function welcome()
     {
         return "Bem-Vindo";
     }
