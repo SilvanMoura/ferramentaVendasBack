@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AmazonScrapeController;
+use App\Http\Controllers\MercadoLivreController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +23,10 @@ Route::post('/register', [ AuthController::class, 'register' ]);
 
 Route::get('/scrape/{asin}', [AmazonScrapeController::class, 'scrape']);
 Route::get('/calculatorMargin/{asin}', [AmazonScrapeController::class, 'calculatorMargin']);
+
+Route::get('/product/{itemId}', [MercadoLivreController::class, 'getProductDetails']);
+
+Route::get('/welcome', [MercadoLivreController::class, 'welcome']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
